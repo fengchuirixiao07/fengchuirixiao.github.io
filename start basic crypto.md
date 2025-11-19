@@ -2,7 +2,7 @@
 >**RSA加密**  
 >>1.同余：
 >><br> &emsp;&emsp; $a \equiv b \pmod{m}$
->>1.1 逆元：
+>>><br>1.1 逆元：
 >><br> &emsp;&emsp; $a \times x \equiv 1 \pmod{m}$
 >>&emsp;&emsp;	$x \equiv a^{-1} \pmod{m}$&emsp;&emsp;则称x为a模m的逆元
 ><br>**2.RSA加密原理：**
