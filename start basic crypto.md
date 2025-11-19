@@ -265,6 +265,7 @@ for i in range(2 ** 16):
 <br>&emsp;&emsp;=[(a*x<sub>n</sub>+b)-(a*x<sub>n-1</sub>+b)+b)]mod(m)
 <br>&emsp;&emsp;=a*t<sub>n-1</sub>+b)+b)mod(m)
 <br>&emsp;&emsp;t<sub>n+1</sub>*t<sub>n-1</sub>=a*t<sub>n</sub>*t<sub>n-1</sub>=t<sub>n</sub>^2
+<br>&emsp;&emsp;t<sub>n+1</sub>与t<sub>n-1</sub>的最大公约数为m
 ```python
 from Crypto.Util.number import *
 import gmpy2
