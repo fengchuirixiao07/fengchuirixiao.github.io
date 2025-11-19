@@ -312,3 +312,111 @@ for i in range(2 ** 16):
     print(flag)
     break
 ```
+**8.ecc.ECDSA**
+><br>椭圆曲线方程：y^2=x^3+ax+b
+><br>密钥生成
+>><br>基点 G：曲线上的一个公开点 (G <sum>x</sum>,G<sum>y</sum>)
+>><br>私钥：一个随机整数 d（通常为 256 位大整数）
+>><br>公钥：Q=d×G（点 G 进行 d 次倍点运算的结果）
+>><br>数学表示
+>><br>私钥：d（标量）
+>><br>公钥：Q=dG（曲线上的点）
+>><br>离散对数问题：已知 Q 和 G，求 d 在计算上是困难的
+>><br>有限域上的椭圆曲线
+>><br>实际应用中在有限域 GF(p)上定义：y^2≡x^3+ax+b(modp)
+>>><br>*数字签名法*
+>>><br>私钥d，必须小于圆锥曲线的阶数（n），d∈[1，n-1]
+>>>><br>1.哈希消息（SHA-256）→哈希值H(m)
+>>>><br>2.生成签名
+>>>><br>选择随机数k，即位阶数
+>>>><br>计算r ；  r = (k * G<sum>x</sum>)modn   G为基点
+>>>><br>计算s ：  s = k^(-1)(H(m)+ r * d)mod m
+
+>>>><br>*解密过程*
+>>>>><br>C1 = r   C2 = s
+>>>>><br>椭圆曲线Ep(a,b)（p为模数），基点（生成元）G(x,y)，G点的阶数n，私钥k，公钥K(x,y)，随机整数r，明文为一点m(x,y)，密文为两点c1(x,y)c2(x,y)（其中基点G，明文m，公钥K，密文c1、c2都是椭圆曲线E上的点）
+
+>>>>><br>选择私钥k（k<n）
+>>>>><br>得到公钥K = k*G
+>>>>><br>选择随机整数r（r<n）
+>>>>><br>加密：
+>>>>><br>c1 = m+r*K
+>>>>><br>c2 = r*G
+>>>>><br>解密：
+>>>>><br>m = c1-k*c2（= c1-r*K)
+```python
+from Crypto.Util.number import long_to_bytes
+
+q = 1139075593950729137191297
+a = 930515656721155210883162
+b = 631258792856205568553568
+
+G = (641322496020493855620384, 437819621961768591577606)
+K = (781988559490437792081406, 76709224526706154630278)
+C_1 = (55568609433135042994738, 626496338010773913984218)
+C_2 = (508425841918584868754821, 816040882076938893064041)
+
+def inverse(x, q):
+    return pow(x, q-2, q)
+
+def add(P, Q, q, a):
+    if P is None:
+        return Q
+    if Q is None:
+        return P
+    x1, y1 = P
+    x2, y2 = Q
+    if x1 != x2 and y1 != y2:
+        t = ((y2 - y1) * inverse(x2 - x1, q)) % q
+    else:
+        t = ((3 * x1 * x1 + a) * inverse(2 * y1, q)) % q
+    x3 = t*t - x1 - x2
+    y3 = t*(x1 - x3) - y1
+    return (x3 % q, y3 % q)
+
+def negate(P, q):
+    if P is None:
+        return None
+    x, y = P
+    return (x, (-y) % q)
+
+def mul(t, P, q, a):
+    if t == 0:
+        return None
+    t_bin = bin(t)[2:]
+    R = None
+    for bit in t_bin:
+        R = add(R, R, q, a)
+        if bit == '1':
+            R = add(R, P, q, a)
+    return R
+
+# Find r by brute force
+print("Searching for r...")
+r_found = None
+for r in range(0, 65536):
+    S = mul(r, G, q, a)
+    if S == C_2:
+        r_found = r
+        print(f"Found r = {r}")
+        break
+
+if r_found is None:
+    print("r not found")
+    exit(1)
+
+# Calculate M = C_1 - r * K
+T = mul(r_found, K, q, a)
+minus_T = negate(T, q)
+M = add(C_1, minus_T, q, a)
+print(f"M = {M}")
+
+m1, m2 = M
+bytes1 = long_to_bytes(m1)
+bytes2 = long_to_bytes(m2)
+msg = bytes1 + bytes2
+print(f"Decrypted msg: {msg}")
+
+flag = b'flag{' + msg + b'}'
+print(flag)
+```
