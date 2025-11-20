@@ -340,10 +340,10 @@ for i in range(2 ** 16):
 >>>>><br>得到公钥K = k*G
 >>>>><br>选择随机整数r（r<n）
 >>>>><br>加密：
->>>>><br>c1 = m+r*K
->>>>><br>c2 = r*G
+>>>>><br>c1 = m+ r * K
+>>>>><br>c2 = r * G
 >>>>><br>解密：
->>>>><br>m = c1-k*c2= (c1-r*K)
+>>>>><br>m = c1-k * c2= (c1-r * K)
 ```python
 from Crypto.Util.number import long_to_bytes
 
